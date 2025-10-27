@@ -1,13 +1,26 @@
 import React from 'react';
 import { estimateEntropyBits } from '../utils/generator';
 import type { Options } from '../utils/generator';
-import zxcvbn from 'zxcvbn';
+import { zxcvbn, zxcvbnOptions } from '@zxcvbn-ts/core';
+import * as zxcvbnCommonPackage from '@zxcvbn-ts/language-common';
+import * as zxcvbnEnPackage from '@zxcvbn-ts/language-en';
 
 type Props = {
   password: string;
   length: number;
   options: Options;
 };
+
+const options = {
+  translations: zxcvbnEnPackage.translations,
+  graphs: zxcvbnCommonPackage.adjacencyGraphs,
+  dictionary: {
+    ...zxcvbnCommonPackage.dictionary,
+    ...zxcvbnEnPackage.dictionary,
+  },
+};
+
+zxcvbnOptions.setOptions(options);
 
 export default function StrengthMeter({ password, length, options }: Props) {
   const entropy = estimateEntropyBits(length, options);
