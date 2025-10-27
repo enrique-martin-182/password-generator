@@ -5,6 +5,8 @@ import StrengthMeter from './components/StrengthMeter';
 import { generatePassword } from './utils/generator';
 import type { Options } from './utils/generator';
 
+import { useToast } from './hooks/useToast';
+
 export default function App() {
   const [length, setLength] = useState<number>(16);
   const [options, setOptions] = useState<Options>({
@@ -14,35 +16,26 @@ export default function App() {
     symbols: false
   });
   const [password, setPassword] = useState<string>('');
-  const [toast, setToast] = useState<string | null>(null);
+  const { toast, showToast } = useToast();
 
   const canGenerate = Object.values(options).some(Boolean);
 
   const gen = () => {
     if (!canGenerate) {
-      setToast('Selecciona al menos una categoría.');
-      setTimeout(() => setToast(null), 2500);
+      showToast('Selecciona al menos una categoría.', 2500);
       return;
     }
-    const p = generatePassword(length, options);
-    setPassword(p);
+    setPassword(generatePassword(length, options));
   };
 
   const copy = async () => {
     if (!password) return;
     try {
       await navigator.clipboard.writeText(password);
-      setToast('Copiado al portapapeles ✅');
-    } catch {
-      const ta = document.createElement('textarea');
-      ta.value = password;
-      document.body.appendChild(ta);
-      ta.select();
-      document.execCommand('copy');
-      ta.remove();
-      setToast('Copiado al portapapeles (fallback) ✅');
-    } finally {
-      setTimeout(() => setToast(null), 2000);
+      showToast('Copiado al portapapeles ✅');
+    } catch (err) {
+      console.error('Failed to copy: ', err);
+      showToast('Error al copiar ❌');
     }
   };
 
@@ -72,7 +65,6 @@ export default function App() {
           <button
             onClick={() => {
               setPassword('');
-              setToast(null);
             }}
             className="px-4 py-2 rounded bg-gray-100 hover:bg-gray-200"
           >
