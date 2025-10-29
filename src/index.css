@@ -6,3 +6,12 @@
 :focus {
   outline: none;
 }
+
+/* Toggle Switch Styles */
+input:checked + .block {
+  background-color: #4f46e5; /* Indigo-600 */
+}
+
+input:checked + .block + .dot {
+  transform: translateX(100%);
+}

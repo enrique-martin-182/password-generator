@@ -3,18 +3,30 @@ export type Options = {
   lower: boolean;
   numbers: boolean;
   symbols: boolean;
+  excludeSimilar: boolean;
 };
 
 const UPPER = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 const LOWER = 'abcdefghijklmnopqrstuvwxyz';
 const NUMBERS = '0123456789';
 const SYMBOLS = '!@#$%^&*()-_=+[]{};:,.<>/?~`';
+const SIMILAR_CHARS = /[il1IoO0]/g;
 
 function getCharset(options: Options) {
   let sets: string[] = [];
-  if (options.upper) sets.push(UPPER);
-  if (options.lower) sets.push(LOWER);
-  if (options.numbers) sets.push(NUMBERS);
+  let upper = UPPER;
+  let lower = LOWER;
+  let numbers = NUMBERS;
+
+  if (options.excludeSimilar) {
+    upper = upper.replace(SIMILAR_CHARS, '');
+    lower = lower.replace(SIMILAR_CHARS, '');
+    numbers = numbers.replace(SIMILAR_CHARS, '');
+  }
+
+  if (options.upper) sets.push(upper);
+  if (options.lower) sets.push(lower);
+  if (options.numbers) sets.push(numbers);
   if (options.symbols) sets.push(SYMBOLS);
   return sets;
 }
